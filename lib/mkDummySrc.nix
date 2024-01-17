@@ -13,6 +13,7 @@ in
 { src
 , cargoLock ? null
 , extraDummyScript ? ""
+, cargoVendorDir ? null
 , ...
 }@args:
 let
@@ -97,7 +98,8 @@ let
     else src;
 
   uncleanSrcBasePath = builtins.unsafeDiscardStringContext ((toString origSrc) + "/");
-  uncleanFiles = findCargoFiles origSrc;
+  ignoredDirectories = if cargoVendorDir != null then [ cargoVendorDir ] else [ ];
+  uncleanFiles = findCargoFiles origSrc ignoredDirectories;
 
   cargoTomlsBase = uncleanSrcBasePath;
   inherit (uncleanFiles) cargoTomls;
