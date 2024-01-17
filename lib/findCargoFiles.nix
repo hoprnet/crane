@@ -2,6 +2,7 @@
 }:
 
 src:
+ignoredDirectories:
 let
   inherit (lib)
     flatten
@@ -19,7 +20,9 @@ let
         isCargoToml = name == "Cargo.toml";
       in
       if type == "directory"
-      then listFilesRecursive (name == ".cargo") cur
+      then (if builtins.any (elem: builtins.match "^.+/${elem}/.+$" (builtins.toString cur) != null) ignoredDirectories
+            then [ ]
+            else listFilesRecursive (name == ".cargo") cur)
       else if isCargoToml
       then [{ path = cur; type = "cargoTomls"; }]
       else if isConfig
